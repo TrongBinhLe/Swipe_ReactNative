@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, Animated } from 'react-native';
+import { StyleSheet, Text, View, Animated, ScrollView } from 'react-native';
 import {Card,Image,CardProps,Button} from 'react-native-elements'
 import Ball from './src/components/Ball.js';
-import Swipe from './src/components/Swipe.js';
+import Deck from './src/components/Deck.js';
 
 const DATA = [
   { id: 1, text: 'Card #1', uri: 'http://imgs.abduzeedo.com/files/paul0v2/unsplash/unsplash-04.jpg' },
@@ -45,9 +45,9 @@ export default class App extends React.Component {
     const { position } = this.state;
     return (
       // <Animated.View style = {position.getLayout()}>
-        <View style = {styles.forEachView}  >
+        <View >
           {/* <Ball/> */}
-          <Swipe
+          <Deck
             renderCard = {this.renderCard}
             data = {DATA}
           />

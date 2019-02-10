@@ -1,5 +1,13 @@
 import React, {Component} from 'react';
-import {View, Text, PanResponder, Animated} from 'react-native';
+import {
+  View,
+  Text,
+  PanResponder,
+  Animated,
+  Dimensions} from 'react-native';
+
+
+const SCREEN_WIDTH = Dimensions.get('screen').width;
 
 class Deck extends Component{    
 
@@ -7,21 +15,55 @@ class Deck extends Component{
     super(props)
     const position = new Animated.ValueXY()
     const _panResponder = PanResponder.create({
-      onStartShouldSetPanResponder : (event, gesture) => { true },
-      onMoveShouldSetPanResponderCapture : (event, gesture) =>{
+      onStartShouldSetPanResponder: (evt, gestureState) => false,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => false,
+      onMoveShouldSetPanResponder: (event, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (event, gestureState) => true,
+      onPanResponderMove : (event, gesture) =>{
       position.setValue({x : gesture.dx, y : gesture.dy});
       },
+      onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease : (event, gesture) =>{
-        position.setValue({x: 0, y: 0})
-      }
+        this.resetPosition();
+      },
       
     })
     
-    this.state = {_panResponder,position}
+    this.state = {_panResponder, position}
   }
+
+  resetPosition(){
+    const {position} = this.state
+    Animated.spring(position,{toValue : {x: 0, y: 0}}).start();
+  }
+
+  getCardStyle() {
+    const { position } = this.state
+    const rotate = position.x.interpolate({
+      inputRange: [-SCREEN_WIDTH * 1.5 , 0, SCREEN_WIDTH * 1.5],
+      outputRange: ['-120 deg','0 deg','120 deg']
+    });
+    return {
+      ...position.getLayout(),
+      transform : [{ rotate }]
+    }
+  }
+
   renderCard = ()=> {
+    const { _panResponder } = this.state
     return(
-      this.props.data.map((item)=>{
+      this.props.data.map((item, index)=>{
+        if(index === 0){
+          return(
+            <Animated.View
+              key = {item.id}
+              style = {this.getCardStyle()}
+              {..._panResponder.panHandlers}
+            >
+              {this.props.renderCard(item)}
+            </Animated.View>
+          )
+        }
         return this.props.renderCard(item);
       })
     )
@@ -29,11 +71,9 @@ class Deck extends Component{
   render() {
     const {_panResponder} = this.state
       return(
-          <Animated.View
-            style = {this.state.position.getLayout()}
-            {..._panResponder.panHandlers}>
+          <View>
               {this.renderCard()}
-          </Animated.View>
+          </View>
       );
     }
 }

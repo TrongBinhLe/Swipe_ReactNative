@@ -30,7 +30,7 @@ export default class App extends React.Component {
   renderCard = (item)=>{
     return(
       <Card key= {item.id}>
-        <Image source = {{uri: item.uri}} style = {{width: 50, height: 50}}/>
+        <Image    style={{ width: 350, height: 200 }} source = {{uri: item.uri}}/>
         <Text>{item.text}</Text>
         <Button
           title = 'Please Press Me !!!'

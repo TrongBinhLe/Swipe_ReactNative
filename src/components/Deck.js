@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {
   View,
-  Text,
   PanResponder,
   Animated,
   Dimensions} from 'react-native';
@@ -25,9 +24,9 @@ class Deck extends Component{
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease : (event, gesture) =>{
         if(gesture.dx > SWIPE_THRESHOLD){
-          this.forceSwipeRight();
+          this.forceSwipe('right');
         } else if(gesture.dx < - SWIPE_THRESHOLD){
-          this.forceSwipeLeft();
+          this.forceSwipe('left');
         } else {
           this.resetPosition();
         }
@@ -36,9 +35,11 @@ class Deck extends Component{
     this.state = {_panResponder, position}
   }
 
-  forceSwipeRight(){
+  forceSwipe(direction){
+const SCREEN_WIDTH = Dimensions.get('screen').width;
+    const x = direction === 'right' ? SCREEN_WIDTH : - SCREEN_WIDTH;
     Animated.timing(this.state.position,{
-      toValue : { x : SCREEN_WIDTH, y : 0},
+      toValue : { x , y : 0},
       duration : SWIPE_OUT_DURATION
     }).start();
   }
@@ -48,12 +49,10 @@ class Deck extends Component{
       duration : SWIPE_OUT_DURATION
     }).start();
   }
-
   resetPosition(){
     const {position} = this.state
     Animated.spring(position,{toValue : {x: 0, y: 0}}).start();
   }
-
   getCardStyle() {
     const { position } = this.state
     const rotate = position.x.interpolate({

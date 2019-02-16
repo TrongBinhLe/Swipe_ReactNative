@@ -4,6 +4,7 @@ import {
   PanResponder,
   Animated,
   Dimensions} from 'react-native';
+import { Card, Button, Text} from 'react-native-elements';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
 const SWIPE_THRESHOLD = 0.65 * SCREEN_WIDTH;
@@ -32,23 +33,25 @@ class Deck extends Component{
         }
       },
     })
-    this.state = {_panResponder, position}
+    this.state = {_panResponder, position, index : 0}
   }
+  
 
   forceSwipe(direction){
-const SCREEN_WIDTH = Dimensions.get('screen').width;
+    const SCREEN_WIDTH = Dimensions.get('screen').width;
     const x = direction === 'right' ? SCREEN_WIDTH : - SCREEN_WIDTH;
     Animated.timing(this.state.position,{
       toValue : { x , y : 0},
       duration : SWIPE_OUT_DURATION
-    }).start();
+    }).start(()=>{this.onSwipeComplete()});
   }
-  forceSwipeLeft(){
-    Animated.timing(this.state.position, {
-      toValue : { x: - SCREEN_WIDTH, y : 0},
-      duration : SWIPE_OUT_DURATION
-    }).start();
+  
+  onSwipeComplete(){
+    const { index } = this.state
+    this.state.position.setValue({x: 0, y: 0})
+    this.setState({index : index +1})
   }
+
   resetPosition(){
     const {position} = this.state
     Animated.spring(position,{toValue : {x: 0, y: 0}}).start();
@@ -61,26 +64,43 @@ const SCREEN_WIDTH = Dimensions.get('screen').width;
     });
     return {
       ...position.getLayout(),
-      transform : [{ rotate }]
+      transform : [{ rotate }],
     }
   }
 
   renderCard = ()=> {
-    const { _panResponder } = this.state
+    const { _panResponder,index } = this.state;
+    const { data } = this.props;
+    if(index>= data.length){
+      return (   
+        <View >
+          {this.props.noCardToRender()}
+        </View>
+      )
+    }
     return(
-      this.props.data.map((item, index)=>{
-        if(index === 0){
+      this.props.data.map((item, i)=>{
+        if(i < index) return null ;
+        if(index === i){
           return(
             <Animated.View
               key = {item.id}
-              style = {this.getCardStyle()}
+              style = {[this.getCardStyle(),styles.stylecard]}
               {..._panResponder.panHandlers}
             >
               {this.props.renderCard(item)}
             </Animated.View>
           )
         }
-        return this.props.renderCard(item);
+
+      return( 
+        <View 
+          key = {item.id}
+          style = {styles.stylecard}
+        >
+          {this.props.renderCard(item)}
+        </View>
+      );
       })
     )
   }
@@ -92,6 +112,12 @@ const SCREEN_WIDTH = Dimensions.get('screen').width;
           </View>
       );
     }
+}
+
+const styles = {
+  stylecard :{
+    position: 'relative'
+  }
 }
 
 export default Deck

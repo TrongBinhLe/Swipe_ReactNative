@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View, Animated, ScrollView } from 'react-native';
-import {Card,Image,CardProps,Button} from 'react-native-elements'
+import { StyleSheet, View, Animated, ScrollView } from 'react-native';
+import {Card,Image,Button,Text} from 'react-native-elements'
 import Ball from './src/components/Ball.js';
 import Deck from './src/components/Deck.js';
 
@@ -41,6 +41,23 @@ export default class App extends React.Component {
     );
   }
   
+  onExcuteButton = ()=>{
+    console.log('onAddToCard')
+  }
+
+  noCardToRender(){
+    return(
+      <Card title = 'Complete Swipe'>
+        <Text style={{marginBottom: 15, fontStyle: "normal"}}>Dont have any Card to render</Text>
+        <Button 
+          title = "Reset All"
+          type = 'outline'
+          onPress = {this.onExcuteButton}
+        />
+      </Card>
+    )
+  }
+
   render() {
     const { position } = this.state;
     return (
@@ -50,6 +67,7 @@ export default class App extends React.Component {
           <Deck
             renderCard = {this.renderCard}
             data = {DATA}
+            noCardToRender= {this.noCardToRender}
           />
         </View>
         // </Animated.View>  
